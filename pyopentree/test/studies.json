@@ -1,0 +1,60 @@
+{
+    "test_find_studies": {
+        "test_function": "studies_find_studies",
+        "test_input": {"study_property":"'ot:studyId'",
+                       "value":"'pg_719'",
+                       "verbose":"True"},
+        "tests": {
+            "contains": [
+                ["matched_studies","Output doesn't contain matched_studies"]
+                ],
+            "equals": [
+                [["'matched_studies'","[]"],"Fails that results are actually empty"]
+                ]
+        }
+    },
+    "test_find_trees": {
+        "test_function": "studies_find_trees",
+        "test_input": {"study_property":"'ot:ottTaxonName'",
+                       "value":"'Garcinia'"
+                      },
+        "tests": {
+            "contains": [
+                ["matched_studies","Output doesn't contain matched_studies"]
+                ],
+            "len_gt": [
+                [["'matched_studies'",1],"Fail - results are actually empty"]
+                ]
+        }
+    },
+    "test_properties": {
+        "test_function": "studies_properties",
+        "test_input": {},
+        "tests": {
+            "contains": [
+                ["tree_properties","Output doesn't contain tree_properties"]
+                ]
+        }
+    },
+    "test_get_study": {
+        "test_function": "get_study",
+        "test_input": {"study_id":"'pg_1144'"},
+        "tests": {
+            "contains": [
+                ["data","Output doesn't contain data"]
+                ]
+        }
+    },
+    "test_get_tree": {
+        "test_function": "get_study_tree",
+        "test_input": {"study_id":"'pg_1144'",
+                       "tree_id":"'tree2324'"
+                    },
+        "tests": {
+            "contains": [
+                ["tree2324","Output doesn't contain correct tree"]
+                ]
+        }
+    }
+
+}

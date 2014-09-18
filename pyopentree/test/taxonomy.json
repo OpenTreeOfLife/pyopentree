@@ -1,0 +1,48 @@
+{
+    "test_about": {
+        "test_function": "taxonomy_about",
+        "test_input": {},
+        "tests": {
+            "contains": [
+                ["author","Output doesn't contain author"]
+                ],
+            "equals": [
+                [["'weburl'","'https://github.com/OpenTreeOfLife/opentree/wiki/Open-Tree-Taxonomy'"],"Fails that results contains correct URL"]     
+                ]
+        }
+    },
+    "test_lica": {
+        "test_function": "taxonomy_lica",
+        "test_input": {"ott_ids": [515698,590452,409712,643717]},
+        "tests": {
+            "contains": [
+                        ["lica","Output doesn't contain lica"]
+                        ],
+            "equals": [
+                        [["'lica']['rank'","'order'"],"Fails that results contains the correct rank"]  
+                      ]
+        }
+    },
+    "test_subtree": {
+        "test_function": "taxonomy_subtree",
+        "test_input": {"ott_id": 515698},
+        "tests": {
+            "contains": [
+                ["subtree","Output doesn't contain subtree"]
+                ]
+        }
+    },
+    "test_taxon": {
+        "test_function": "taxonomy_taxon",
+        "test_input": {"ott_id": 515698},
+        "tests": {
+            "of_type": ["dict","Response is of wrong type"],            
+            "contains": [
+                ["rank","Output doesn't contain rank"]
+                ],
+            "equals": [
+                [["'synonyms'","['Barnadesia', 'Barnadesia Mutis']"],"Fails that results contains correct synonyms"]
+                ]
+        }
+    }
+}

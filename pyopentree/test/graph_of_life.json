@@ -1,0 +1,42 @@
+{
+    "test_about": {
+        "test_function": "gol_about",
+        "test_input": {},
+        "tests": {
+            "contains": [
+                ["graph_root_node_id","Output doesn't contain graph_root_node_id"],
+                ["graph_root_name","Output doesn't contain graph_root_name"],
+                ["graph_num_tips","Output doesn't contain graph_num_tips"],
+                ["graph_taxonomy_version","Output doesn't contain graph_taxonomy_version"],
+                ["graph_num_source_trees","Output doesn't contain graph_num_source_trees"]
+                ]
+        }
+    },
+    "test_source_tree": {
+        "test_function": "gol_source_tree",
+        "test_input": {
+            "study_id":"'pg_420'", 
+            "tree_id": "'522'", 
+            "git_sha": "'a2c48df995ddc9fd208986c3d4225112550c8452'"
+            },
+        "tests": {
+             "of_type": ["dict","Response is of wrong type"],
+             "contains": [
+                 ["newick","Doesn't contain newick string"]
+                 ]
+        }
+    },
+    "test_node_info": {
+        "test_function": "gol_node_info",
+        "test_input": {"ott_id":810751},
+        "tests": {
+             "of_type": ["dict","Response is of wrong type"],
+             "contains": [
+                 ["rank","Doesn't contain rank string"]
+                 ],
+             "equals": [
+                 [["'name'","'Trochilidae'"],"Fails that results contains Trochilidae"]
+                 ]
+        }
+    }
+}
