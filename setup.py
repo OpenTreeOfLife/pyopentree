@@ -47,7 +47,7 @@ else:
 EXTRA_KWARGS = dict(
     install_requires = ['setuptools'],
     include_package_data = True,
-    test_suite = "pyopentree.test",
+    test_suite = "test.test_pyopentree",
     zip_safe = True,
     )
 

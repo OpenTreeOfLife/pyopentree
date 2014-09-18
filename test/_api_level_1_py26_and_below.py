@@ -1,31 +1,16 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 import unittest
 import sys
-import locale
-ENCODING = locale.getdefaultlocale()[1]
 # so we import local api before any globally installed one
-sys.path.insert(0,"../")
+sys.path.insert(0,"../pyopentree")
+# we might also be calling this from root, so
+sys.path.insert(0,"pyopentree")
 import opentreeservice
 from opentreeservice import OpenTreeService
 import json
-if sys.version_info.major < 3:
-    from urllib2 import urlopen
-    from urllib2 import URLError, HTTPError
-else:
-    from urllib.request import urlopen
-    from urllib.error import URLError
+from urllib2 import urlopen
+from urllib2 import URLError, HTTPError
 
 use_file = False
-
-def exec_and_return_locals(statement, locals_dict=None):
-    """
-    Executes `statement` and returns locals dict.
-    """
-    if locals_dict is None:
-        locals_dict = locals()
-    exec(statement, None, locals_dict)
-    return locals_dict
 
 class bcolors:
     HEADER = '\033[95m'
@@ -35,94 +20,92 @@ class bcolors:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
 
-
 class OpenTreeLib(unittest.TestCase):
 
     def test_tree_of_life_tests(self):
-        print("\n" + bcolors.OKBLUE + "     Running ToL tests\n" + bcolors.ENDC)
+        print "\n" + bcolors.OKBLUE + "     Running ToL tests\n" + bcolors.ENDC
         try:
             if (not use_file):
                 data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/tree_of_life.json')
-                data = json.loads(data_file.read().decode(ENCODING))
+                data = json.loads(data_file.read())
             else:
-                with open('tree_of_life.json') as data_file:
-                    data = json.load(data_file)
+                data_file = open('tree_of_life.json').read()
+                data = json.loads(data_file)
             self.run_tests(data)
-        except URLError as e:
+        except URLError, e:
             if e.code == 404:
-                self.assertTrue(False,"Error fetching tree_of_life.json from GitHub")
+                self.assert_(False,"Error fetching tree_of_life.json from GitHub")
             else:
                 raise
 
 
     def test_graph_of_life_tests(self):
-        print("\n" + bcolors.OKBLUE + "     Running GoL tests\n" + bcolors.ENDC)
+        print "\n" + bcolors.OKBLUE + "     Running GoL tests\n" + bcolors.ENDC
         try:
             response = opentreeservice.gol_source_tree("pg_420", "522", "a2c48df995ddc9fd208986c3d4225112550c8452")
 
             if (not use_file):
                 data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/graph_of_life.json')
-                data = json.loads(data_file.read().decode(ENCODING))
+                data = json.loads(data_file.read())
             else:
-                with open('graph_of_life.json') as data_file:
-                    data = json.load(data_file)
+                data_file = open('graph_of_life.json').read()
+                data = json.loads(data_file)
             self.run_tests(data)
-        except URLError as e:
+        except URLError, e:
             if e.code == 404:
-                self.assertTrue(False,"Error fetching graph_of_life.json from GitHub")
+                self.assert_(False,"Error fetching graph_of_life.json from GitHub")
             else:
                 raise
 
 
     def test_tnrs_tests(self):
-        print("\n" + bcolors.OKBLUE + "     Running TNRS tests\n" + bcolors.ENDC)
+        print "\n" + bcolors.OKBLUE + "     Running TNRS tests\n" + bcolors.ENDC
         try:
             if (not use_file):
                 data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/tnrs.json')
-                data = json.loads(data_file.read().decode(ENCODING))
+                data = json.loads(data_file.read())
             else:
-                with open('tnrs.json') as data_file:
-                    data = json.load(data_file)
+                data_file = open('tnrs.json').read()
+                data = json.loads(data_file)
             self.run_tests(data)
-        except URLError as e:
+        except URLError, e:
             if e.code == 404:
-                self.assertTrue(False,"Error fetching tnrs.json from GitHub")
+                self.assert_(False,"Error fetching tnrs.json from GitHub")
             else:
                 raise
 
 
     def test_taxonomy_tests(self):
-        print("\n" + bcolors.OKBLUE + "     Running Taxonomy tests\n" + bcolors.ENDC)
+        print "\n" + bcolors.OKBLUE + "     Running Taxonomy tests\n" + bcolors.ENDC
         try:
             if (not use_file):
                 data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/taxonomy.json')
-                data = json.loads(data_file.read().decode(ENCODING))
+                data = json.loads(data_file.read())
             else:
-                with open('taxonomy.json') as data_file:
-                    data = json.load(data_file)
+                data_file = open('taxonomy.json').read()
+                data = json.loads(data_file)
             self.run_tests(data)
-        except URLError as e:
+        except URLError, e:
             if e.code == 404:
-                self.assertTrue(False,"Error fetching taxonomy.json from GitHub")
+                self.assert_(False,"Error fetching taxonomy.json from GitHub")
             else:
                 raise
 
     def test_studies_tests(self):
-        print("\n" + bcolors.OKBLUE + "     Running Studies tests\n" + bcolors.ENDC)
+        print "\n" + bcolors.OKBLUE + "     Running Studies tests\n" + bcolors.ENDC
         try:
             if (not use_file):
                 data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/studies.json')
-                data = json.loads(data_file.read().decode(ENCODING))
+                data = json.loads(data_file.read())
             else:
-                with open('studies.json') as data_file:
-                    data = json.load(data_file)
+                data_file = open('studies.json').read()
+                data = json.loads(data_file)
             self.run_tests(data)
-        except URLError as e:
+        except URLError, e:
             if e.code == 404:
-                self.assertTrue(False,"Error fetching studies.json from GitHub")
+                self.assert_(False,"Error fetching studies.json from GitHub")
             else:
                 raise
-
 
     def construct_arguments(self,data):
         
@@ -130,7 +113,7 @@ class OpenTreeLib(unittest.TestCase):
         i = 0
 
         for arg in data['test_input']:
-            if isinstance(data['test_input'][arg], str):
+            if isinstance(data['test_input'][arg], basestring):
                 arg_val = "'"+data['test_input'][arg]+"'"
             else:
                 arg_val = str(data['test_input'][arg])
@@ -150,22 +133,22 @@ class OpenTreeLib(unittest.TestCase):
     def run_tests(self, data):
 
         for key in data:
-            print("\tRunning test: "+key)
+            print "\tRunning test: "+key
             try:
                 if (data[key]['test_input'] == {}):
-                    response = exec_and_return_locals('response = opentreeservice.'+data[key]['test_function']+'()', locals())["response"]
+                    exec('response = opentreeservice.'+data[key]['test_function']+'()')
                 else:
                     args = self.construct_arguments(data[key])
-                    response = exec_and_return_locals(args, locals())["response"]
+                    exec(args)
             except:
                 if "error" in data[key]['tests']:
                     for sub_test in data[key]['tests']['error']:
                         with self.assertRaises(eval(sub_test[0])):
                             if (data[key]['test_input'] == {}):
-                                response = exec_and_return_locals('response = opentreeservice.'+data[key]['test_function']+'()', locals())['response']
+                                exec('response = opentreeservice.'+data[key]['test_function']+'()')
                             else:
                                 args = self.construct_arguments(data[key])
-                                response = exec_and_return_locals(args, locals())["response"]
+                                exec(args)
                 else:
                     # we got here because there was an exception, but we didn't test for it. Raise it.
                     raise
@@ -173,39 +156,44 @@ class OpenTreeLib(unittest.TestCase):
             for test in data[key]['tests']:
                 if test == 'contains':
                     for sub_test in data[key]['tests'][test]:
-                        self.assertTrue(sub_test[0] in response, key+": "+sub_test[1])
+                        self.assert_(sub_test[0] in response, key+": "+sub_test[1])
                 elif test == 'of_type':
                     sub_test = data[key]['tests'][test]
-                    self.assertTrue(isinstance(response,eval(sub_test[0])), key+": "+sub_test[1])
+                    self.assert_(isinstance(response,eval(sub_test[0])), key+": "+sub_test[1])
                 elif test == 'equals':
                     for sub_test in data[key]['tests'][test]:
-                        self.assertTrue(eval("response['"+sub_test[0][0]+"']") == sub_test[0][1], key+": "+sub_test[1])
+                        self.assert_(eval("response['"+sub_test[0][0]+"']") == sub_test[0][1], key+": "+sub_test[1])
                 elif test == 'deep_equals':
                     for sub_test in data[key]['tests'][test]:
                         results = ""
                         i = 0
                         for result in sub_test[0][0]:
-                            if isinstance(result,str):
+                            if isinstance(result,basestring):
                                 results += "['" + result + "']"
                             else:
                                 results += "["+str(result)+"]"
                             i += 1
 
-                        self.assertTrue(eval("response"+results) == sub_test[0][1], key+": "+sub_test[1])
+                        self.assert_(eval("response"+results) == sub_test[0][1], key+": "+sub_test[1])
                 elif test == 'length_greater_than':
                     for sub_test in data[key]['tests'][test]:
-                        self.assertTrue(eval("len(response['"+sub_test[0][0]+"'])") > sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response['"+sub_test[0][0]+"'])")))
+                        self.assert_(eval("len(response['"+sub_test[0][0]+"'])") > sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response['"+sub_test[0][0]+"'])")))
                 elif test == 'length_less_than':
                     for sub_test in data[key]['tests'][test]:
-                        self.assertTrue(eval("len(response['"+sub_test[0][0]+"'])") < sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response['"+sub_test[0][0]+"'])")))
+                        self.assert_(eval("len(response['"+sub_test[0][0]+"'])") < sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response['"+sub_test[0][0]+"'])")))
                 elif test == "error":
                     continue
                     # dealt with above!
                 else:
-                    print("\t\t" + bcolors.FAIL + "Oh oh. I didn't know how to deal with test type: " + test + bcolors.ENDC)
+                    print "\t\t" + bcolors.FAIL + "Oh oh. I didn't know how to deal with test type: " + test + bcolors.ENDC
 
+def run():
+    suite = unittest.TestSuite()
+    for method in dir(OpenTreeLib):
+       if method.startswith("test"):
+          suite.addTest(OpenTreeLib(method))
+    unittest.TextTestRunner().run(suite)
 
 
 if __name__ == '__main__':
-    unittest.main()
-
+    run()
