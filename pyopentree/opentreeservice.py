@@ -37,6 +37,7 @@ class OpenTreeService(object):
             self.base_url = 'http://devapi.opentreeoflife.org/v2'
         else:
             self.base_url = base_url
+        self.is_testing_mode = False
 
     def otl_format_specifier_extension(self, schema):
         schema = schema.lower()
@@ -66,7 +67,7 @@ class OpenTreeService(object):
         response_contents = response.read().decode(OpenTreeService.ENCODING)
         if process_response_as == "json":
             response_contents = json.loads(response_contents)
-            if 'error' in response_contents:
+            if 'error' in response_contents and not self.is_testing_mode:
                 raise OpenTreeService.OpenTreeError(response_contents['error'])
         elif process_response_as == "text":
             pass
