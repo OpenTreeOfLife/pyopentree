@@ -3,7 +3,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from opentreelib import *
+from pyopentree import *
 
 def inspect_opentreelib_output(opentreelib_output):
     import types
