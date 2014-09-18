@@ -3,6 +3,6 @@ python:
   - "3.3"
   - "2.7"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
-install: PLEASE CHANGE ME
+install: python setup.py install
 # command to run tests, e.g. python setup.py test
 script:  python pyopentree/test/_api_level_1.py_1.py
