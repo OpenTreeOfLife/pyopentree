@@ -85,7 +85,7 @@ else:
 # Main setup
 
 ### compose long description ###
-long_description = open('README.rst').read()
+long_description = open('README.md').read()
 long_description = long_description.replace("PyOpenTree-x.x.x", "PyOpenTree-{}".format(__version__))
 long_description = long_description.replace("""download the source code archive""",
     """`download the source code archive <http://pypi.python.org/packages/source/D/PyOpenTree/PyOpenTree-{}.tar.gz>`_""".format(__version__))
