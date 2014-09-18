@@ -2,13 +2,13 @@ import unittest
 import sys
 # so we import local api before any globally installed one
 sys.path.insert(0,"../")
-import opentreelib
-from opentreelib import OpenTreeService
+import opentreeservice
+from opentreeservice import OpenTreeService
 import json
 from urllib2 import urlopen
 from urllib2 import URLError, HTTPError
 
-use_file = True
+use_file = False
 
 class bcolors:
     HEADER = '\033[95m'
@@ -24,7 +24,7 @@ class OpenTreeLib(unittest.TestCase):
         print "\n" + bcolors.OKBLUE + "     Running ToL tests\n" + bcolors.ENDC
         try:
             if (not use_file):
-                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/opentree-interfaces/master/python/test/tree_of_life.json')
+                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/tree_of_life.json')
                 data = json.loads(data_file.read())
             else:
                 data_file = open('tree_of_life.json').read()
@@ -40,10 +40,10 @@ class OpenTreeLib(unittest.TestCase):
     def test_graph_of_life_tests(self):
         print "\n" + bcolors.OKBLUE + "     Running GoL tests\n" + bcolors.ENDC
         try:
-            response = opentreelib.gol_source_tree("pg_420", "522", "a2c48df995ddc9fd208986c3d4225112550c8452")
+            response = opentreeservice.gol_source_tree("pg_420", "522", "a2c48df995ddc9fd208986c3d4225112550c8452")
 
             if (not use_file):
-                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/opentree-interfaces/master/python/test/graph_of_life.json')
+                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/graph_of_life.json')
                 data = json.loads(data_file.read())
             else:
                 data_file = open('graph_of_life.json').read()
@@ -60,7 +60,7 @@ class OpenTreeLib(unittest.TestCase):
         print "\n" + bcolors.OKBLUE + "     Running TNRS tests\n" + bcolors.ENDC
         try:
             if (not use_file):
-                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/opentree-interfaces/master/python/test/tnrs.json')
+                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/tnrs.json')
                 data = json.loads(data_file.read())
             else:
                 data_file = open('tnrs.json').read()
@@ -77,7 +77,7 @@ class OpenTreeLib(unittest.TestCase):
         print "\n" + bcolors.OKBLUE + "     Running Taxonomy tests\n" + bcolors.ENDC
         try:
             if (not use_file):
-                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/opentree-interfaces/master/python/test/taxonomy.json')
+                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/taxonomy.json')
                 data = json.loads(data_file.read())
             else:
                 data_file = open('taxonomy.json').read()
@@ -93,7 +93,7 @@ class OpenTreeLib(unittest.TestCase):
         print "\n" + bcolors.OKBLUE + "     Running Studies tests\n" + bcolors.ENDC
         try:
             if (not use_file):
-                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/opentree-interfaces/master/python/test/studies.json')
+                data_file = urlopen('https://raw.githubusercontent.com/OpenTreeOfLife/shared-api-tests/master/studies.json')
                 data = json.loads(data_file.read())
             else:
                 data_file = open('studies.json').read()
@@ -105,6 +105,28 @@ class OpenTreeLib(unittest.TestCase):
             else:
                 raise
 
+    def construct_arguments(self,data):
+        
+        arguments = ""
+        i = 0
+
+        for arg in data['test_input']:
+            if isinstance(data['test_input'][arg], basestring):
+                arg_val = "'"+data['test_input'][arg]+"'"
+            else:
+                arg_val = str(data['test_input'][arg])
+            # Exceptions - some keywords need amended to python values
+            if arg == 'property':
+                # this is actually study_property
+                arg = 'study_property'
+            if i == len(data)-1:
+                arguments = arguments + arg + "=" + arg_val
+            else:
+                arguments = arguments + arg + "=" + arg_val + ","
+            i += 1
+
+        return 'response = opentreeservice.'+data['test_function']+'('+arguments+')'
+
     # This is the function that does the heavy lifting
     def run_tests(self, data):
 
@@ -112,33 +134,19 @@ class OpenTreeLib(unittest.TestCase):
             print "\tRunning test: "+key
             try:
                 if (data[key]['test_input'] == {}):
-                    exec('response = opentreelib.'+data[key]['test_function']+'()')
+                    exec('response = opentreeservice.'+data[key]['test_function']+'()')
                 else:
-                    arguments = ""
-                    i = 0
-                    for arg in data[key]['test_input']:
-                        if i == len(data[key]['test_input'])-1:
-                            arguments = arguments + arg + "=" + str(data[key]['test_input'][arg])
-                        else:
-                            arguments = arguments + arg + "=" + str(data[key]['test_input'][arg]) + ","
-                        i += 1
-                    exec('response = opentreelib.'+data[key]['test_function']+'('+arguments+')')
+                    args = self.construct_arguments(data[key])
+                    exec(args)
             except:
                 if "error" in data[key]['tests']:
                     for sub_test in data[key]['tests']['error']:
                         with self.assertRaises(eval(sub_test[0])):
-                            if (data[key]['test_input'] == 'null'):
-                                exec('response = opentreelib.'+data[key]['test_function']+'()')
+                            if (data[key]['test_input'] == {}):
+                                exec('response = opentreeservice.'+data[key]['test_function']+'()')
                             else:
-                                arguments = ""
-                                i = 0
-                                for arg in data[key]['test_input']:
-                                    if i == len(data[key]['test_input'])-1:
-                                        arguments = arguments + arg + "=" + str(data[key]['test_input'][arg])
-                                    else:
-                                        arguments = arguments + arg + "=" + str(data[key]['test_input'][arg]) + ","
-                                    i += 1
-                                exec('response = opentreelib.'+data[key]['test_function']+'('+arguments+')')
+                                args = self.construct_arguments(data[key])
+                                exec(args)
                 else:
                     # we got here because there was an exception, but we didn't test for it. Raise it.
                     raise
@@ -152,13 +160,25 @@ class OpenTreeLib(unittest.TestCase):
                     self.assert_(isinstance(response,eval(sub_test[0])), key+": "+sub_test[1])
                 elif test == 'equals':
                     for sub_test in data[key]['tests'][test]:
-                        self.assert_(eval("response["+sub_test[0][0]+"]") == eval(sub_test[0][1]), key+": "+sub_test[1])
-                elif test == 'len_gt':
+                        self.assert_(eval("response['"+sub_test[0][0]+"']") == sub_test[0][1], key+": "+sub_test[1])
+                elif test == 'deep_equals':
                     for sub_test in data[key]['tests'][test]:
-                        self.assert_(eval("len(response["+sub_test[0][0]+"])") > sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response["+sub_test[0][0]+"])")))
-                elif test == 'len_lt':
+                        results = ""
+                        i = 0
+                        for result in sub_test[0][0]:
+                            if isinstance(result,basestring):
+                                results += "['" + result + "']"
+                            else:
+                                results += "["+str(result)+"]"
+                            i += 1
+
+                        self.assert_(eval("response"+results) == sub_test[0][1], key+": "+sub_test[1])
+                elif test == 'length_greater_than':
                     for sub_test in data[key]['tests'][test]:
-                        self.assert_(eval("len(response["+sub_test[0][0]+"])") < sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response["+sub_test[0][0]+"])")))
+                        self.assert_(eval("len(response['"+sub_test[0][0]+"'])") > sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response['"+sub_test[0][0]+"'])")))
+                elif test == 'length_less_than':
+                    for sub_test in data[key]['tests'][test]:
+                        self.assert_(eval("len(response['"+sub_test[0][0]+"'])") < sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response['"+sub_test[0][0]+"'])")))
                 elif test == "error":
                     continue
                     # dealt with above!
