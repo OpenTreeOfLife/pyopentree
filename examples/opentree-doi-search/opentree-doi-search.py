@@ -28,6 +28,7 @@ import os
 import argparse
 import collections
 import pyopentree
+import dendropy
 
 __prog__ = os.path.basename(__file__)
 __version__ = "1.0.0"
@@ -93,9 +94,7 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
                         citation=citation)
                 yield s
 
-    def get_trees(self,
-            doi,
-            schema="nexus"):
+    def get_trees(self, doi):
         study_query = self.studies_find_studies(
                 property_name="ot:studyPublication",
                 property_value=doi,
@@ -111,10 +110,11 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
             tree_ids.extend(tree_group["treeById"].keys())
         tree_strings = []
         for tree_id in tree_ids:
-            s = self.get_study_tree(study_id=study_id, tree_id=tree_id, schema=schema)
-            print(s)
+            s = self.get_study_tree(study_id=study_id, tree_id=tree_id, schema="newick")
             tree_strings.append(s)
-        return tree_strings
+        tree_str = "\n".join(tree_strings)
+        trees = dendropy.TreeList.get_from_string(tree_str, "newick")
+        return trees
 
 def main():
     """
@@ -179,10 +179,10 @@ def main():
                     study.citation))
     elif args.subparser_name == "get-trees":
         # http://dx.doi.org/10.1111/j.1365-294X.2012.05606.x
-        trees_string = ots.get_trees(doi=args.doi, schema=args.schema)
-        if trees_string is None:
+        trees = ots.get_trees(doi=args.doi)
+        if trees is None:
             sys.exit("No studies found with DOI: '{}'".format(args.doi))
-        print(trees_string)
+        print(trees.as_string(args.schema))
     else:
         parser.print_usage(sys.stderr)
         sys.exit(1)
