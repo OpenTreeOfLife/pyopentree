@@ -50,6 +50,23 @@ def collapse_tnrs_match_names_results(results, method='first_hit_only'):
 def write_tree_to_path(tree, path, schema='nexml'):
     tree.write_to_path(dest=path, schema='nexml')
 
+def get_internal_nodes(tree, only_named_nodes=False, exclude_seed_node=False):
+    node_iterator = tree.preorder_internal_node_iter(
+        filter_fn=None, exclude_seed_node=exclude_seed_node)
+    nodes = list()
+    for node in node_iterator:
+        if (not only_named_nodes) or (only_named_nodes and node.taxon is not None):
+            nodes.append(node)
+    return nodes
+
+def get_leaf_nodes(tree):
+    node_iterator = tree.leaf_node_iter(
+        filter_fn=None)
+    nodes = list()
+    for node in node_iterator:
+        nodes.append(node)
+    return nodes
+
 # Abstract pyopentree wrappers -------------------------------------------------
 
 def extract_property_from_tnrs_match_names(
@@ -172,6 +189,18 @@ if __name__ == "__main__":
         keep_taxon_name=True,
         keep_ott_id=False)
     print(induced_tree)
+
+    internal_nodes = get_internal_nodes(
+        tree=induced_tree, only_named_nodes=True, exclude_seed_node=False)
+    for internal_node in internal_nodes:
+        print(internal_node)
+    print()
+
+    leaf_nodes = get_leaf_nodes(
+        tree=induced_tree)
+    for leaf_node in leaf_nodes:
+        print(leaf_node)
+    print()
 
 
     ott_ids = get_ott_ids(
