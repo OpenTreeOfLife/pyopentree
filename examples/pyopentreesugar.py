@@ -115,6 +115,23 @@ def get_tol_induced_tree(ott_ids, keep_taxon_name=True, keep_ott_id=True):
 
     return induced_tree
 
+def get_tol_subtree(ott_id, keep_taxon_name=True, keep_ott_id=True):
+
+    raw_api_data = pyopentree.tol_subtree(ott_id=ott_id, node_id=None, tree_id=None)
+
+    subtree = dendropy.Tree.get_from_string(
+        src=raw_api_data['newick'],
+        schema='newick',
+        preserve_underscores=True,
+        suppress_internal_node_taxa=False)
+
+    subtree = parse_opentree_taxon_labels_in_dendropy_tree(
+        tree=subtree,
+        keep_taxon_name=keep_taxon_name,
+        keep_ott_id=keep_ott_id)
+
+    return subtree
+
 if __name__ == "__main__":
 
     ott_ids = get_ott_ids(
@@ -135,3 +152,9 @@ if __name__ == "__main__":
         keep_taxon_name=True,
         keep_ott_id=False)
     print(induced_tree)
+
+    tol_subtree = get_tol_subtree(
+        ott_id='541933',
+        keep_taxon_name=True,
+        keep_ott_id=False)
+    print(tol_subtree)
