@@ -10,12 +10,32 @@ import pyopentree
 
 def parse_opentree_taxon_label(taxon_label):
 
-    taxon_label_split = taxon_label.split['_']
+    taxon_label_split = taxon_label.split('_')
 
     taxon_name_parts = taxon_label_split[0:-1]
-    ott_id = taxon_label_split[-1]
+    ott_id = taxon_label_split[-1].strip('ott')
 
     return {'taxon_name_parts': taxon_name_parts, 'ott_id': ott_id}
+
+def parse_opentree_taxon_labels_in_dendropy_tree(tree, keep_taxon_name=True, keep_ott_id=True):
+
+    node_iterator = tree.preorder_node_iter(filter_fn=None)
+
+    for node in node_iterator:
+        if node.taxon is not None:
+            parsed_label = parse_opentree_taxon_label(taxon_label=node.taxon.label)
+
+            new_label = ''
+            if keep_taxon_name:
+                new_label = '_'.join(parsed_label['taxon_name_parts'])
+            if keep_ott_id:
+                if keep_taxon_name:
+                    new_label = new_label + '_'
+                new_label = new_label + 'ott' + parsed_label['ott_id']
+
+            node.taxon.label = new_label
+
+    return tree
 
 def collapse_tnrs_match_names_results(results, method='first_hit_only'):
 
@@ -76,7 +96,7 @@ def get_ott_ids(
 
     return ott_ids
 
-def get_induced_tree(ott_ids):
+def get_induced_tree(ott_ids, keep_taxon_name=True, keep_ott_id=True):
 
     raw_api_data = pyopentree.tol_induced_tree(
             ott_ids=ott_ids.values(),
@@ -87,6 +107,11 @@ def get_induced_tree(ott_ids):
         schema='newick',
         preserve_underscores=True,
         suppress_internal_node_taxa=False)
+
+    induced_tree = parse_opentree_taxon_labels_in_dendropy_tree(
+        tree=induced_tree,
+        keep_taxon_name=keep_taxon_name,
+        keep_ott_id=keep_ott_id)
 
     return induced_tree
 
@@ -105,5 +130,8 @@ if __name__ == "__main__":
         method='first_hit_only')
     print(ott_ids)
 
-    induced_tree = get_induced_tree(ott_ids=ott_ids)
+    induced_tree = get_induced_tree(
+        ott_ids=ott_ids,
+        keep_taxon_name=True,
+        keep_ott_id=False)
     print(induced_tree)
