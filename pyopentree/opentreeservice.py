@@ -48,6 +48,24 @@ class OpenTreeService(object):
         Override this to provide custom added functionality, to, e.g. cache the
         requests. Signature and return is the same as Python's standard
         library's `urlopen`.
+
+        Example
+        -------
+
+        The following shows how you might want to use a special class that
+        caches the calls to the server using VCRpy.
+
+            import vcr
+            import pyopentree
+            class CachedOpenTreeService(pyopentree.OpenTreeService):
+                def __init__(self, *args, **kwargs):
+                    self.cache_path = kwargs.pop("cache_path",
+                            ".opentree.cache.yaml")
+                    pyopentree.OpenTreeService.__init__(self, *args, **kwargs)
+                def open_url(self, request):
+                    with vcr.use_cassette(self.cache_path):
+                        return pyopentree.OpenTreeService.open_url(self, request)
+
         """
         return urlopen(request)
 
