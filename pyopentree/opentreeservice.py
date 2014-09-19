@@ -734,8 +734,8 @@ class OpenTreeService(object):
 
     def studies_find_studies(
             self,
-            study_property=None,
-            value=None,
+            property_name=None,
+            property_value=None,
             exact=False,
             verbose=False):
         """
@@ -751,11 +751,12 @@ class OpenTreeService(object):
 
         Parameters
         ----------
-        study_property : string
-            The property to be searched on. A list of searchable properties is
-            available from the `studies_properties` function. To find all studies,
-            omit both the property and the value from your query.
-        value : string
+        property_name : string
+            The *study* property to be searched on. A list of searchable
+            properties is available from `studies_properties()["study_properties"]`.
+            To find all studies, omit both the property and the value from your
+            query.
+        property_value : string
             The value to be searched. This must be passed as a string, but will be
             converted to the datatype corresponding to the specified searchable
             value. To find all studies, omit both the property and the value from
@@ -776,14 +777,14 @@ class OpenTreeService(object):
                 "matched_studies"
         """
         payload = {"exact" : exact}
-        if study_property is None or value is None:
-            if study_property is not None:
-                raise ValueError("If 'study_property' is specified, 'value' must be specified as well")
-            if value is not None:
-                raise ValueError("If 'value' is specified, 'study_property' must be specified as well")
+        if property_name is None or property_value is None:
+            if property_name is not None:
+                raise ValueError("If 'property_name' is specified, 'property_value' must be specified as well")
+            if property_value is not None:
+                raise ValueError("If 'property_value' is specified, 'property_name' must be specified as well")
         else:
-            payload["property"] = study_property
-            payload["value"] = value
+            payload["property"] = property_name
+            payload["value"] = property_value
         result = self.request(
             '/studies/find_studies',
             payload=payload)
@@ -791,8 +792,8 @@ class OpenTreeService(object):
 
     def studies_find_trees(
             self,
-            study_property,
-            value,
+            property_name,
+            property_value,
             exact=False,
             verbose=False):
         """
@@ -807,10 +808,10 @@ class OpenTreeService(object):
 
         Parameters
         ----------
-        study_property : string
-            The property to be searched on. A list of searchable properties is
-            available from the `studies_properties` function.
-        value : string
+        property_name : string
+            The *tree* property to be searched on. A list of searchable
+            properties is available from `studies_properties()["tree_properties"]`.
+        property_value : string
             The value to be searched. This must be passed as a string, but will be
             converted to the datatype corresponding to the specified searchable
             value.
@@ -831,8 +832,8 @@ class OpenTreeService(object):
         """
         payload = {
                 "exact" : exact,
-                "property": study_property,
-                "value": value, }
+                "property": property_name,
+                "value": property_value, }
         result = self.request(
             '/studies/find_trees',
             payload=payload)
@@ -1105,8 +1106,8 @@ def taxonomy_taxon(ott_id, include_lineage=False):
             )
 
 def studies_find_studies(
-        study_property=None,
-        value=None,
+        property_name=None,
+        property_value=None,
         exact=False,
         verbose=False,
         ):
@@ -1114,15 +1115,15 @@ def studies_find_studies(
     Forwards to :meth:`OpenTreeService.studies_find_studies()` of the global :class:`OpenTreeService` instance.
     """
     return GLOBAL_OPEN_TREE_SERVICE.studies_find_studies(
-            study_property=study_property,
-            value=value,
+            property_name=property_name,
+            property_value=property_value,
             exact=exact,
             verbose=verbose,
             )
 
 def studies_find_trees(
-        study_property,
-        value,
+        property_name,
+        property_value,
         exact=False,
         verbose=False,
         ):
@@ -1130,8 +1131,8 @@ def studies_find_trees(
     Forwards to :meth:`OpenTreeService.studies_find_trees()` of the global :class:`OpenTreeService` instance.
     """
     return GLOBAL_OPEN_TREE_SERVICE.studies_find_trees(
-            study_property=study_property,
-            value=value,
+            property_name=property_name,
+            property_value=property_value,
             exact=exact,
             verbose=verbose,
             )
@@ -1293,12 +1294,12 @@ if __name__ == "__main__":
     # curl -X POST http://devapi.opentreeoflife.org/v2/studies/find_studies -H "content-type:application/json" -d '{"property":"ot:studyId","value":"pg_719","verbose":true}'
     human_readable_output_inspection(
         function_name='studies_find_studies',
-        function_output=studies_find_studies(study_property="ot:studyId", value="pg_719", verbose=True))
+        function_output=studies_find_studies(property_name="ot:studyId", property_value="pg_719", verbose=True))
 
     # curl -X POST http://devapi.opentreeoflife.org/v2/studies/find_trees -H "content-type:application/json" -d '{"property":"ot:ottTaxonName","value":"Garcinia"}'
     human_readable_output_inspection(
         function_name='studies_find_trees',
-        function_output=studies_find_trees(study_property="ot:ottTaxonName", value="Garcinia"))
+        function_output=studies_find_trees(property_name="ot:ottTaxonName", property_value="Garcinia"))
 
     # curl -X POST http://devapi.opentreeoflife.org/v2/studies/properties
     human_readable_output_inspection(

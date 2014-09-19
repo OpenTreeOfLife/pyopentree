@@ -95,8 +95,8 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
         for study_dict in studies_dict["matched_studies"][study_slice]:
             study_id = study_dict["ot:studyId"]
             study_dict = pyopentree.get_study_meta(study_id)["nexml"]
-            citation = study_dict.get('^ot:studyPublicationReference', None)
-            doi_dict = study_dict.get('^ot:studyPublication', None)
+            citation = study_dict.get("^ot:studyPublicationReference", None)
+            doi_dict = study_dict.get("^ot:studyPublication", None)
             if doi_dict is not None:
                 doi = doi_dict["@href"]
             else:
@@ -127,6 +127,16 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
                     study.doi,
                     study.citation))
 
+    def get_trees(self,
+            doi,
+            schema="nexml"):
+        # verbose
+        tree_ids = self.studies_find_trees(
+                study_property="ot:studyPublication",
+                value=doi,
+                exact=True)
+        print(tree_ids)
+
 def main():
     """
     Main CLI handler.
@@ -135,12 +145,12 @@ def main():
     parser = argparse.ArgumentParser(description=__description__)
     subparsers = parser.add_subparsers(help='commands', dest="subparser_name")
 
-    # A list command
-    list_studies_parser = subparsers.add_parser('list-studies', help='List contents')
+    # list studies
+    list_studies_parser = subparsers.add_parser("list-studies", help="List contents")
     list_studies_parser.add_argument("--filter-for-taxon",
             action="append",
             default=False,
-            help="Filter for studies with specific taxa")
+            help="Filter for studies with specific taxa (multiple filters will be OR'd together).")
     list_studies_parser.add_argument("--list-from",
             type=int,
             default=None,
@@ -148,18 +158,21 @@ def main():
     list_studies_parser.add_argument("--max-studies",
             type=int,
             default=None,
-            help="Maximum number of studies to list")
+            help="Maximum number of studies to list.")
     list_studies_parser.add_argument("--as-table",
             action="store_true",
             default=False,
-            help="Format as (tab-delimited) rows")
+            help="Format as (tab-delimited) rows.")
 
-    # A create command
-    # create_parser = subparsers.add_parser('create', help='Create a directory')
-    # create_parser.add_argument('dirname', action='store', help='New directory to create')
-    # create_parser.add_argument('--read-only', default=False, action='store_true',
-    #                         help='Set permissions to prevent writing to the directory',
-    #                         )
+    # get trees
+    get_trees_parser = subparsers.add_parser("get-trees", help="Retrieve trees")
+    get_trees_parser.add_argument("doi",
+            help="DOI of the study containing the trees to retrieve")
+    get_trees_parser.add_argument("-f", "--format",
+            dest="schema",
+            choices=["nexus", "newick", "nexml"],
+            default="nexml",
+            help="DOI of the study containing the trees to retrieve (default: '%(default)s').")
 
     # # A delete command
     # delete_parser = subparsers.add_parser('delete', help='Remove a directory')
@@ -178,6 +191,11 @@ def main():
                 max_studies=args.max_studies,
                 as_table=args.as_table,
                 )
+    elif args.subparser_name == "get-trees":
+        # http://dx.doi.org/10.1111/j.1365-294X.2012.05606.x
+        ots.get_trees(
+            doi=args.doi,
+            schema=args.schema)
     else:
         parser.print_usage(sys.stderr)
         sys.exit(1)
