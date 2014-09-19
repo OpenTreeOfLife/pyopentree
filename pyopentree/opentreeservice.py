@@ -791,7 +791,7 @@ class OpenTreeService(object):
 
     def studies_find_trees(
             self,
-            study_property,
+            tree_property,
             value,
             exact=False,
             verbose=False):
@@ -807,7 +807,7 @@ class OpenTreeService(object):
 
         Parameters
         ----------
-        study_property : string
+        tree_property : string
             The property to be searched on. A list of searchable properties is
             available from the `studies_properties` function.
         value : string
@@ -831,7 +831,7 @@ class OpenTreeService(object):
         """
         payload = {
                 "exact" : exact,
-                "property": study_property,
+                "property": tree_property,
                 "value": value, }
         result = self.request(
             '/studies/find_trees',
