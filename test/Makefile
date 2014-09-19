@@ -6,9 +6,9 @@
 #
 
 PYTHON="python"
-LEGACY_PYTHON = $(shell $(PYTHON) -c 'import sys; print(sys.hexversion < 0x2070000)')
+LEGACY_PYTHON = $(shell $(PYTHON) -c 'import sys; print(sys.hexversion < 0x03000000)')
 ifeq ($(LEGACY_PYTHON),True)
-	UNIT_TESTS = _api_level_1.py26_and_below.py
+	UNIT_TESTS = _api_level_1_py26_and_below.py
 else
 	UNIT_TESTS = _api_level_1.py
 endif

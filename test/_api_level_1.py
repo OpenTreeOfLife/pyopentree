@@ -19,6 +19,9 @@ else:
     from urllib.error import URLError
 
 use_file = False
+TestingOpenTreeClass = OpenTreeService()
+TestingOpenTreeClass.is_testing_mode = True
+
 
 def exec_and_return_locals(statement, locals_dict=None):
     """
@@ -146,7 +149,7 @@ class OpenTreeLib(unittest.TestCase):
                 arguments = arguments + arg + "=" + arg_val + ","
             i += 1
 
-        return 'response = opentreeservice.'+data['test_function']+'('+arguments+')'
+        return 'response = TestingOpenTreeClass.'+data['test_function']+'('+arguments+')'
 
     # This is the function that does the heavy lifting
     def run_tests(self, data):
@@ -155,16 +158,16 @@ class OpenTreeLib(unittest.TestCase):
             print("\tRunning test: "+key)
             try:
                 if (data[key]['test_input'] == {}):
-                    response = exec_and_return_locals('response = opentreeservice.'+data[key]['test_function']+'()', locals())["response"]
+                    response = exec_and_return_locals('response = TestingOpenTreeClass.'+data[key]['test_function']+'()', locals())["response"]
                 else:
                     args = self.construct_arguments(data[key])
                     response = exec_and_return_locals(args, locals())["response"]
             except:
-                if "error" in data[key]['tests']:
-                    for sub_test in data[key]['tests']['error']:
+                if "parameters_error" in data[key]['tests']:
+                    for sub_test in data[key]['tests']['parameters_error']:
                         with self.assertRaises(eval(sub_test[0])):
                             if (data[key]['test_input'] == {}):
-                                response = exec_and_return_locals('response = opentreeservice.'+data[key]['test_function']+'()', locals())['response']
+                                response = exec_and_return_locals('response = TestingOpenTreeClass.'+data[key]['test_function']+'()', locals())['response']
                             else:
                                 args = self.construct_arguments(data[key])
                                 response = exec_and_return_locals(args, locals())["response"]
@@ -200,9 +203,12 @@ class OpenTreeLib(unittest.TestCase):
                 elif test == 'length_less_than':
                     for sub_test in data[key]['tests'][test]:
                         self.assertTrue(eval("len(response['"+sub_test[0][0]+"'])") < sub_test[0][1], key+": "+sub_test[1] + " len "+str(eval("len(response['"+sub_test[0][0]+"'])")))
-                elif test == "error":
+                elif test == "parameters_error":
                     continue
                     # dealt with above!
+                elif test == "contains_error":
+                    for sub_test in data[key]['tests'][test]:
+                        self.assert_("error" in response, key+": "+sub_test[0])
                 else:
                     print("\t\t" + bcolors.FAIL + "Oh oh. I didn't know how to deal with test type: " + test + bcolors.ENDC)
 
