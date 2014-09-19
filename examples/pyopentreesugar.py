@@ -96,7 +96,7 @@ def get_ott_ids(
 
     return ott_ids
 
-def get_induced_tree(ott_ids, keep_taxon_name=True, keep_ott_id=True):
+def get_tol_induced_tree(ott_ids, keep_taxon_name=True, keep_ott_id=True):
 
     raw_api_data = pyopentree.tol_induced_tree(
             ott_ids=ott_ids.values(),
@@ -130,7 +130,7 @@ if __name__ == "__main__":
         method='first_hit_only')
     print(ott_ids)
 
-    induced_tree = get_induced_tree(
+    induced_tree = get_tol_induced_tree(
         ott_ids=ott_ids,
         keep_taxon_name=True,
         keep_ott_id=False)
