@@ -47,6 +47,9 @@ def collapse_tnrs_match_names_results(results, method='first_hit_only'):
 
     return results
 
+def write_tree_to_path(tree, path, schema='nexml'):
+    tree.write_to_path(dest=path, schema='nexml')
+
 # Abstract pyopentree wrappers -------------------------------------------------
 
 def extract_property_from_tnrs_match_names(
@@ -159,12 +162,10 @@ if __name__ == "__main__":
         include_dubious=False)
     print(ott_ids)
 
-
     ott_ids_collapsed = collapse_tnrs_match_names_results(
         results=ott_ids,
         method='first_hit_only')
     print(ott_ids)
-
 
     induced_tree = get_tol_induced_tree(
         ott_ids=ott_ids,
@@ -173,11 +174,24 @@ if __name__ == "__main__":
     print(induced_tree)
 
 
+    ott_ids = get_ott_ids(
+        names=['Solanaceae'],
+        context_name=None,
+        do_approximate_matching=False,
+        include_deprecated=False,
+        include_dubious=False)
+    print(ott_ids)
+
     tol_subtree = get_tol_subtree(
-        ott_id='541933',
+        ott_id=ott_ids['Solanaceae'][0],
         keep_taxon_name=True,
         keep_ott_id=False)
-    print(tol_subtree)
+    # print(tol_subtree)
+
+    write_tree_to_path(
+        tree=tol_subtree,
+        path='~/Desktop/Solanaceae.nexml',
+        schema='nexml')
 
 
     # taxonomy_subtree = get_taxonomy_subtree(
