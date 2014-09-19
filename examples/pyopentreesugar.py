@@ -102,7 +102,7 @@ def collapse_tnrs_match_names_results(results, method='first_hit_only'):
     return results
 
 def write_tree_to_path(tree, path, schema='nexml'):
-    tree.write_to_path(dest=path, schema='nexml')
+    tree.write_to_path(dest=path, schema=schema)
 
 def get_internal_nodes(tree, only_named_nodes=False, exclude_seed_node=False):
     node_iterator = tree.preorder_internal_node_iter(
@@ -187,7 +187,8 @@ def get_tol_induced_tree(ott_ids, keep_taxon_name=True, keep_ott_id=True):
         src=raw_api_data['subtree'],
         schema='newick',
         preserve_underscores=True,
-        suppress_internal_node_taxa=False)
+        suppress_internal_node_taxa=False,
+        terminating_semicolon_required=False)
 
     induced_tree = parse_opentree_taxon_labels_in_dendropy_tree(
         tree=induced_tree,
@@ -204,7 +205,8 @@ def get_tol_subtree(ott_id, keep_taxon_name=True, keep_ott_id=True):
         src=raw_api_data['newick'],
         schema='newick',
         preserve_underscores=True,
-        suppress_internal_node_taxa=False)
+        suppress_internal_node_taxa=False,
+        terminating_semicolon_required=False)
 
     subtree = parse_opentree_taxon_labels_in_dendropy_tree(
         tree=subtree,
@@ -221,7 +223,8 @@ def get_taxonomy_subtree(ott_id, keep_taxon_name=True, keep_ott_id=True):
         src=raw_api_data['subtree'],
         schema='newick',
         preserve_underscores=True,
-        suppress_internal_node_taxa=False)
+        suppress_internal_node_taxa=False,
+        terminating_semicolon_required=False)
 
     subtree = parse_opentree_taxon_labels_in_dendropy_tree(
         tree=subtree,
@@ -230,77 +233,108 @@ def get_taxonomy_subtree(ott_id, keep_taxon_name=True, keep_ott_id=True):
 
     return subtree
 
+def tol_mrca(ott_ids):
+    raw_api_data = pyopentree.tol_mrca(ott_ids=ott_ids.values(), node_ids=None)
+
+    return {raw_api_data['mrca_name']: raw_api_data['ott_id']}
+
 if __name__ == "__main__":
 
+    # ott_ids = get_ott_ids(
+    #     names=['dog', 'cat', 'canada goose', 'african elephant', 'monarch butterfly', 'Solanum chilense', 'Prunus dulcis'],
+    #     context_name=None,
+    #     do_approximate_matching=False,
+    #     include_deprecated=False,
+    #     include_dubious=False)
+    # print(ott_ids)
+
+    # ott_ids_collapsed = collapse_tnrs_match_names_results(
+    #     results=ott_ids,
+    #     method='first_hit_only')
+    # print(ott_ids)
+
+    # induced_tree = get_tol_induced_tree(
+    #     ott_ids=ott_ids,
+    #     keep_taxon_name=True,
+    #     keep_ott_id=False)
+    # print(induced_tree)
+
+    # internal_nodes = get_internal_nodes(
+    #     tree=induced_tree, only_named_nodes=True, exclude_seed_node=False)
+    # for internal_node in internal_nodes:
+    #     print(internal_node)
+    # print()
+
+    # leaf_nodes = get_leaf_nodes(
+    #     tree=induced_tree)
+    # for leaf_node in leaf_nodes:
+    #     print(leaf_node)
+    # print()
+
+    # colors = ['red', 'green', 'blue', 'orange', 'pink']
+    # nexss = NEXSS()
+    # internal_node_count = len(internal_nodes)
+    # j = 0
+    # for i, node in enumerate(internal_nodes):
+    #     if i % len(colors) == 0:
+    #         j = 0
+    #     else:
+    #         j = j + 1
+    #     style = {'color': colors[j]}
+    #     nexss.annotate_node(
+    #         node=node,
+    #         tag='clade',
+    #         content=node.taxon.label,
+    #         style=style)
+
+    # nexss.write_to_path('/Users/karolis/Desktop/induced_tree.nexss')
+
+    # induced_tree = normalize_branch_lengths(
+    #     tree=induced_tree,
+    #     branch_length=1.0)
+
+    # write_tree_to_path(
+    #     tree=induced_tree,
+    #     path='/Users/karolis/Desktop/induced_tree.nexml',
+    #     schema='nexml')
+
+    # Clade
+    clade = 'Hominoidea'
     ott_ids = get_ott_ids(
-        names=['dog', 'cat', 'canada goose', 'african elephant', 'monarch butterfly', 'Solanum chilense', 'Prunus dulcis'],
+        names=[clade],
         context_name=None,
         do_approximate_matching=False,
         include_deprecated=False,
         include_dubious=False)
     print(ott_ids)
 
-    ott_ids_collapsed = collapse_tnrs_match_names_results(
-        results=ott_ids,
-        method='first_hit_only')
-    print(ott_ids)
+    # ott_ids = get_ott_ids(
+    #     names=['Geospiza', 'Iridophanes'],
+    #     context_name=None,
+    #     do_approximate_matching=False,
+    #     include_deprecated=False,
+    #     include_dubious=False)
+    # print(ott_ids)
 
-    induced_tree = get_tol_induced_tree(
-        ott_ids=ott_ids,
-        keep_taxon_name=True,
-        keep_ott_id=False)
-    print(induced_tree)
+    # ott_ids_collapsed = collapse_tnrs_match_names_results(
+    #     results=ott_ids,
+    #     method='first_hit_only')
+    # print(ott_ids)
 
-    internal_nodes = get_internal_nodes(
-        tree=induced_tree, only_named_nodes=True, exclude_seed_node=False)
-    for internal_node in internal_nodes:
-        print(internal_node)
-    print()
+    # mrca = tol_mrca(ott_ids)
 
-    leaf_nodes = get_leaf_nodes(
-        tree=induced_tree)
-    for leaf_node in leaf_nodes:
-        print(leaf_node)
-    print()
+    # clade = mrca.keys()[0]
 
-    colors = ['red', 'green', 'blue', 'orange', 'pink']
-    nexss = NEXSS()
-    internal_node_count = len(internal_nodes)
-    j = 0
-    for i, node in enumerate(internal_nodes):
-        if i % len(colors) == 0:
-            j = 0
-        else:
-            j = j + 1
-        style = {'color': colors[j]}
-        nexss.annotate_node(
-            node=node,
-            tag='clade',
-            content=node.taxon.label,
-            style=style)
-
-    nexss.write_to_path('/Users/karolis/Desktop/induced_tree.nexss')
-
-    induced_tree = normalize_branch_lengths(
-        tree=induced_tree,
-        branch_length=1.0)
-
-    write_tree_to_path(
-        tree=induced_tree,
-        path='/Users/karolis/Desktop/induced_tree.nexml',
-        schema='nexml')
-
-
-    ott_ids = get_ott_ids(
-        names=['Solanaceae'],
-        context_name=None,
-        do_approximate_matching=False,
-        include_deprecated=False,
-        include_dubious=False)
-    print(ott_ids)
+    # ott_ids = get_ott_ids(
+    #     names=[clade],
+    #     context_name=None,
+    #     do_approximate_matching=False,
+    #     include_deprecated=False,
+    #     include_dubious=False)
+    # print(ott_ids)
 
     tol_subtree = get_tol_subtree(
-        ott_id=ott_ids['Solanaceae'][0],
+        ott_id=ott_ids[clade][0],
         keep_taxon_name=True,
         keep_ott_id=False)
     # print(tol_subtree)
@@ -317,7 +351,7 @@ if __name__ == "__main__":
     #     print(leaf_node)
     # print()
 
-    colors = ['red', 'green', 'blue', 'orange', 'pink']
+    colors = ['red', 'green', 'blue', 'orange']
     nexss = NEXSS()
     internal_node_count = len(internal_nodes)
     j = 0
@@ -333,7 +367,9 @@ if __name__ == "__main__":
             content=node.taxon.label,
             style=style)
 
-    nexss.write_to_path('/Users/karolis/Desktop/Solanaceae.nexss')
+    tol_subtree.ladderize(ascending=True)
+
+    nexss.write_to_path('/Users/karolis/Desktop/' + clade + '.nexss')
 
     tol_subtree = normalize_branch_lengths(
         tree=tol_subtree,
@@ -341,12 +377,32 @@ if __name__ == "__main__":
 
     write_tree_to_path(
         tree=tol_subtree,
-        path='/Users/karolis/Desktop/Solanaceae.nexml',
+        path='/Users/karolis/Desktop/' + clade + '.nexml',
         schema='nexml')
 
+    write_tree_to_path(
+        tree=tol_subtree,
+        path='/Users/karolis/Desktop/' + clade + '.newick',
+        schema='newick')
 
-    # taxonomy_subtree = get_taxonomy_subtree(
-    #     ott_id='541933',
-    #     keep_taxon_name=True,
-    #     keep_ott_id=False)
-    # print(taxonomy_subtree)
+    import subprocess
+    # command = 'pstastic.py ~/Desktop/' + clade + '.nexml ~/Desktop/' + clade + '.nexss --output ~/Desktop/' + clade + '.pdf -ow 3000 -oh 8000 --dpi 300'
+    command = 'pstastic.py ~/Desktop/' + clade + '.nexml ~/Desktop/' + clade + '.nexss --output ~/Desktop/' + clade + '.pdf'
+    subprocess.call(
+        command,
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.PIPE,
+        shell=True)
+
+    subprocess.call(
+        'open ~/Desktop/' + clade + '.pdf',
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.PIPE,
+        shell=True)
+
+
+    taxonomy_subtree = get_taxonomy_subtree(
+        ott_id='541933',
+        keep_taxon_name=True,
+        keep_ott_id=False)
+    print(taxonomy_subtree)
