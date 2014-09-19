@@ -1,6 +1,6 @@
 # pyopentreelib
 
-A python binding for the OpenTree of Life API. This is a function-for-function binding. The functions are detailed [here](https://github.com/OpenTreeOfLife/opentree/wiki/Libraries-for-working-with-opentree-in-various-languages-%28service-bindings-and-wrappers,-etc.%29)
+A python binding for the [OpenTree of Life API](https://github.com/OpenTreeOfLife/opentree/wiki/Open-Tree-of-Life-APIs). This is a function-for-function binding. The functions are detailed [here](https://github.com/OpenTreeOfLife/opentree/wiki/Libraries-for-working-with-opentree-in-various-languages-%28service-bindings-and-wrappers,-etc.%29)
 
 ## Test status
 
