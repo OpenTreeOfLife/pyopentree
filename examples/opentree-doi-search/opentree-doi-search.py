@@ -29,13 +29,6 @@ import argparse
 import collections
 import pyopentree
 
-try:
-    import vcr
-    CACHING_AVAILABLE = True
-except ImportError:
-    CACHING_AVAILABLE = False
-    pass
-
 __prog__ = os.path.basename(__file__)
 __version__ = "1.0.0"
 __description__ = __doc__
@@ -58,14 +51,6 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
                 ".opentree.cache.yaml")
         pyopentree.OpenTreeService.__init__(self, *args, **kwargs)
 
-    def open_url(self, request):
-        if CACHING_AVAILABLE:
-            with vcr.use_cassette(self.cache_path,
-                    record_mode="new_episodes"):
-                return pyopentree.OpenTreeService.open_url(self, request)
-        else:
-            return pyopentree.OpenTreeService.open_url(self, request)
-
     def slice_from(self, slice_from, slice_limit):
         """
         - slice_from: 1-based index of where to start slice; defaults to None (=first)
@@ -79,7 +64,7 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
             if slice_start is None:
                 slice_to = slice_limit
             else:
-                slice_to = slice_start + slice_limit
+                slice_to = slice_start + slice_limit + 1
         else:
             slice_to = None
         slice_result = slice(slice_from, slice_to)
@@ -108,34 +93,19 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
                         citation=citation)
                 yield s
 
-    def list_studies(self,
-            list_from=None,
-            max_studies=None,
-            as_table=True,
-            table_column_delimiter="\t",
-            out=sys.stdout):
-        for study in self.yield_studies(
-                list_from=list_from,
-                max_studies=max_studies):
-            if as_table:
-                out.write("{}{}{}\n".format(
-                    study.doi,
-                    table_column_delimiter,
-                    study.citation))
-            else:
-                out.write("[{}]\n{}\n\n".format(
-                    study.doi,
-                    study.citation))
-
     def get_trees(self,
             doi,
             schema="nexml"):
-        # verbose
-        tree_ids = self.studies_find_trees(
-                study_property="ot:studyPublication",
-                value=doi,
-                exact=True)
-        print(tree_ids)
+        study_query = self.studies_find_studies(
+                property_name="ot:studyPublication",
+                property_value=doi,
+                exact=True,
+                verbose=False)
+        matched_studies = study_query["matched_studies"]
+        if not matched_studies:
+            return None
+        else:
+            return "OK"
 
 def main():
     """
@@ -186,16 +156,24 @@ def main():
 
     ots = OpenTreeDoiSearcher()
     if args.subparser_name == "list-studies":
-        ots.list_studies(
+        out = sys.stdout
+        for study in ots.yield_studies(
                 list_from=args.list_from,
-                max_studies=args.max_studies,
-                as_table=args.as_table,
-                )
+                max_studies=args.max_studies):
+            if args.as_table:
+                out.write("{}\t{}\n".format(
+                    study.doi,
+                    study.citation))
+            else:
+                out.write("[{}]\n{}\n\n".format(
+                    study.doi,
+                    study.citation))
     elif args.subparser_name == "get-trees":
         # http://dx.doi.org/10.1111/j.1365-294X.2012.05606.x
-        ots.get_trees(
-            doi=args.doi,
-            schema=args.schema)
+        trees_string = ots.get_trees(doi=args.doi, schema=args.schema)
+        if trees_string is None:
+            sys.exit("No studies found with DOI: '{}'".format(args.doi))
+        print(trees_string)
     else:
         parser.print_usage(sys.stderr)
         sys.exit(1)
