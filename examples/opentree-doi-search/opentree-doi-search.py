@@ -79,7 +79,7 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
         study_slice = self.slice_from(list_from, max_studies)
         for study_dict in studies_dict["matched_studies"][study_slice]:
             study_id = study_dict["ot:studyId"]
-            study_dict = pyopentree.get_study_meta(study_id)["nexml"]
+            study_dict = self.get_study_meta(study_id)["nexml"]
             citation = study_dict.get("^ot:studyPublicationReference", None)
             doi_dict = study_dict.get("^ot:studyPublication", None)
             if doi_dict is not None:
@@ -95,7 +95,7 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
 
     def get_trees(self,
             doi,
-            schema="nexml"):
+            schema="nexus"):
         study_query = self.studies_find_studies(
                 property_name="ot:studyPublication",
                 property_value=doi,
@@ -104,8 +104,17 @@ class OpenTreeDoiSearcher(pyopentree.OpenTreeService):
         matched_studies = study_query["matched_studies"]
         if not matched_studies:
             return None
-        else:
-            return "OK"
+        study_id = matched_studies[0]["ot:studyId"]
+        study_trees = self.get_study_meta(study_id)["nexml"]["treesById"]
+        tree_ids = []
+        for tree_group in study_trees.values():
+            tree_ids.extend(tree_group["treeById"].keys())
+        tree_strings = []
+        for tree_id in tree_ids:
+            s = self.get_study_tree(study_id=study_id, tree_id=tree_id, schema=schema)
+            print(s)
+            tree_strings.append(s)
+        return tree_strings
 
 def main():
     """
