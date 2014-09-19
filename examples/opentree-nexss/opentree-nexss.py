@@ -28,7 +28,7 @@ class NEXSS(object):
             for style in self.styles:
                 nexss_file.write(style[1] + '\n\n')
 
-    def annotate_node(self, node, tag, content, style):
+    def annotate_node(self, node, tag, content, style, mode='overwrite'):
 
         node.annotations.drop(name=tag)
 
@@ -47,7 +47,14 @@ class NEXSS(object):
 
         sid_idx = self.style_id_index(style_id)
         if sid_idx >= 0:
-            self.styles.pop(sid_idx)
+            if mode == 'overwrite':
+                self.styles.pop(sid_idx)
+            elif mode == 'append':
+                for k in style:
+                    self.styles[sid_idx][2][k] = style[k]
+                style = self.styles[sid_idx][2]
+            else:
+                raise NotImplementedError()
 
         style_str_left = style_id + ' {\n'
         style_str_right = '}'
@@ -58,7 +65,10 @@ class NEXSS(object):
 
         style_str = style_str + style_str_right
 
-        self.styles.append([style_id, style_str])
+        if mode == 'overwrite':
+            self.styles.append([style_id, style_str, style])
+        elif mode == 'append':
+            self.styles[sid_idx][1] = style_str
 
 # Utility functions ------------------------------------------------------------
 
@@ -366,6 +376,33 @@ if __name__ == "__main__":
             tag='clade',
             content=node.taxon.label,
             style=style)
+
+    node = tol_subtree.find_node(lambda x: (x.taxon is not None) and (x.taxon.label == 'Pongo'))
+    style = {'border': '2px'}
+    nexss.annotate_node(
+        node=node,
+        tag='clade',
+        content=node.taxon.label,
+        style=style,
+        mode='append')
+
+    node = tol_subtree.find_node(lambda x: (x.taxon is not None) and (x.taxon.label == 'Hoolock'))
+    style = {'border': '4px'}
+    nexss.annotate_node(
+        node=node,
+        tag='clade',
+        content=node.taxon.label,
+        style=style,
+        mode='append')
+
+    node = tol_subtree.find_node(lambda x: (x.taxon is not None) and (x.taxon.label == 'Hylobates_lar'))
+    style = {'border': '6px'}
+    nexss.annotate_node(
+        node=node,
+        tag='clade',
+        content=node.taxon.label,
+        style=style,
+        mode='append')
 
     tol_subtree.ladderize(ascending=True)
 
