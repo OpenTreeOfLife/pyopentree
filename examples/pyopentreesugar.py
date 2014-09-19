@@ -132,6 +132,23 @@ def get_tol_subtree(ott_id, keep_taxon_name=True, keep_ott_id=True):
 
     return subtree
 
+def get_taxonomy_subtree(ott_id, keep_taxon_name=True, keep_ott_id=True):
+
+    raw_api_data = pyopentree.taxonomy_subtree(ott_id=ott_id)
+
+    subtree = dendropy.Tree.get_from_string(
+        src=raw_api_data['subtree'],
+        schema='newick',
+        preserve_underscores=True,
+        suppress_internal_node_taxa=False)
+
+    subtree = parse_opentree_taxon_labels_in_dendropy_tree(
+        tree=subtree,
+        keep_taxon_name=keep_taxon_name,
+        keep_ott_id=keep_ott_id)
+
+    return subtree
+
 if __name__ == "__main__":
 
     ott_ids = get_ott_ids(
@@ -142,10 +159,12 @@ if __name__ == "__main__":
         include_dubious=False)
     print(ott_ids)
 
+
     ott_ids_collapsed = collapse_tnrs_match_names_results(
         results=ott_ids,
         method='first_hit_only')
     print(ott_ids)
+
 
     induced_tree = get_tol_induced_tree(
         ott_ids=ott_ids,
@@ -153,8 +172,16 @@ if __name__ == "__main__":
         keep_ott_id=False)
     print(induced_tree)
 
+
     tol_subtree = get_tol_subtree(
         ott_id='541933',
         keep_taxon_name=True,
         keep_ott_id=False)
     print(tol_subtree)
+
+
+    # taxonomy_subtree = get_taxonomy_subtree(
+    #     ott_id='541933',
+    #     keep_taxon_name=True,
+    #     keep_ott_id=False)
+    # print(taxonomy_subtree)
