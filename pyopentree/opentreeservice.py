@@ -43,6 +43,14 @@ class OpenTreeService(object):
         schema = schema.lower()
         return OpenTreeService.TREE_SCHEMA_EXTENSION_MAP[schema]
 
+    def open_url(self, request):
+        """
+        Override this to provide custom added functionality, to, e.g. cache the
+        requests. Signature and return is the same as Python's standard
+        library's `urlopen`.
+        """
+        return urlopen(request)
+
     def request(self,
             sub_url,
             payload=None,
@@ -63,7 +71,7 @@ class OpenTreeService(object):
                 url=url,
                 data=data,
                 headers=headers)
-        response = urlopen(request)
+        response = self.open_url(request)
         response_contents = response.read().decode(OpenTreeService.ENCODING)
         if process_response_as == "json":
             response_contents = json.loads(response_contents)

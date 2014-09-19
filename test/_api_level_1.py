@@ -18,7 +18,7 @@ else:
     from urllib.request import urlopen
     from urllib.error import URLError
 
-use_file = True
+use_file = False
 TestingOpenTreeClass = OpenTreeService()
 TestingOpenTreeClass.is_testing_mode = True
 

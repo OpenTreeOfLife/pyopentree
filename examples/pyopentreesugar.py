@@ -6,6 +6,60 @@ from __future__ import unicode_literals
 import dendropy
 import pyopentree
 
+# NEXSS sugar ------------------------------------------------------------------
+
+class NEXSS(object):
+
+    def __init__(self):
+        self.datatype_hint = 'xsd:string'
+        self.name_prefix = 'nexss'
+        self.namespace = 'http://phylotastic.org/nexss#'
+        self.styles = list()
+
+    def style_id_index(self, style_id):
+        for i, style in enumerate(self.styles):
+            if style[0] == style_id:
+                return i
+                break
+        return -1
+
+    def write_to_path(self, path):
+        with open(path, 'w') as nexss_file:
+            for style in self.styles:
+                nexss_file.write(style[1] + '\n\n')
+
+    def annotate_node(self, node, tag, content, style):
+
+        node.annotations.drop(name=tag)
+
+        node.annotations.add_new(
+            name=tag,
+            value=content,
+            datatype_hint=self.datatype_hint,
+            name_prefix=self.name_prefix,
+            namespace=self.namespace,
+            name_is_prefixed=False,
+            is_attribute=False,
+            annotate_as_reference=False,
+            is_hidden=False)
+
+        style_id = 'node[' + self.name_prefix + ':' + tag + '=' + content + ']'
+
+        sid_idx = self.style_id_index(style_id)
+        if sid_idx >= 0:
+            self.styles.pop(sid_idx)
+
+        style_str_left = style_id + ' {\n'
+        style_str_right = '}'
+        style_str = style_str_left
+
+        for k in style:
+            style_str = style_str + '\t' + k + ': ' + style[k] + ';\n'
+
+        style_str = style_str + style_str_right
+
+        self.styles.append([style_id, style_str])
+
 # Utility functions ------------------------------------------------------------
 
 def parse_opentree_taxon_label(taxon_label):
@@ -66,6 +120,13 @@ def get_leaf_nodes(tree):
     for node in node_iterator:
         nodes.append(node)
     return nodes
+
+def normalize_branch_lengths(tree, branch_length=1.0):
+    node_iterator = tree.preorder_node_iter(
+        filter_fn=None)
+    for node in node_iterator:
+        node.edge.length = branch_length
+    return tree
 
 # Abstract pyopentree wrappers -------------------------------------------------
 
@@ -202,6 +263,33 @@ if __name__ == "__main__":
         print(leaf_node)
     print()
 
+    colors = ['red', 'green', 'blue', 'orange', 'pink']
+    nexss = NEXSS()
+    internal_node_count = len(internal_nodes)
+    j = 0
+    for i, node in enumerate(internal_nodes):
+        if i % len(colors) == 0:
+            j = 0
+        else:
+            j = j + 1
+        style = {'color': colors[j]}
+        nexss.annotate_node(
+            node=node,
+            tag='clade',
+            content=node.taxon.label,
+            style=style)
+
+    nexss.write_to_path('/Users/karolis/Desktop/induced_tree.nexss')
+
+    induced_tree = normalize_branch_lengths(
+        tree=induced_tree,
+        branch_length=1.0)
+
+    write_tree_to_path(
+        tree=induced_tree,
+        path='/Users/karolis/Desktop/induced_tree.nexml',
+        schema='nexml')
+
 
     ott_ids = get_ott_ids(
         names=['Solanaceae'],
@@ -217,9 +305,43 @@ if __name__ == "__main__":
         keep_ott_id=False)
     # print(tol_subtree)
 
+    internal_nodes = get_internal_nodes(
+        tree=tol_subtree, only_named_nodes=True, exclude_seed_node=False)
+    # for internal_node in internal_nodes:
+    #     print(internal_node)
+    # print()
+
+    leaf_nodes = get_leaf_nodes(
+        tree=tol_subtree)
+    # for leaf_node in leaf_nodes:
+    #     print(leaf_node)
+    # print()
+
+    colors = ['red', 'green', 'blue', 'orange', 'pink']
+    nexss = NEXSS()
+    internal_node_count = len(internal_nodes)
+    j = 0
+    for i, node in enumerate(internal_nodes):
+        if i % len(colors) == 0:
+            j = 0
+        else:
+            j = j + 1
+        style = {'color': colors[j]}
+        nexss.annotate_node(
+            node=node,
+            tag='clade',
+            content=node.taxon.label,
+            style=style)
+
+    nexss.write_to_path('/Users/karolis/Desktop/Solanaceae.nexss')
+
+    tol_subtree = normalize_branch_lengths(
+        tree=tol_subtree,
+        branch_length=1.0)
+
     write_tree_to_path(
         tree=tol_subtree,
-        path='~/Desktop/Solanaceae.nexml',
+        path='/Users/karolis/Desktop/Solanaceae.nexml',
         schema='nexml')
 
 
