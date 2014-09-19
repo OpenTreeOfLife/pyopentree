@@ -140,9 +140,20 @@ class OpenTreeLib(unittest.TestCase):
             else:
                 arg_val = str(data['test_input'][arg])
             # Exceptions - some keywords need amended to python values
-            if arg == 'property':
-                # this is actually study_property
-                arg = 'study_property'
+            if data['test_function'] == 'studies_find_studies':
+                if arg == 'property':
+                    # this is actually study_property
+                    arg = 'property_name'
+                if arg == 'value':
+                    arg = 'property_value'
+            if data['test_function'] == 'studies_find_trees':
+                if arg == 'property':
+                    # this is actually study_property
+                    arg = 'property_name'
+                if arg == 'value':
+                    arg = 'property_value'
+
+
             if i == len(data)-1:
                 arguments = arguments + arg + "=" + arg_val
             else:
@@ -164,13 +175,13 @@ class OpenTreeLib(unittest.TestCase):
                     response = exec_and_return_locals(args, locals())["response"]
             except:
                 if "parameters_error" in data[key]['tests']:
-                    for sub_test in data[key]['tests']['parameters_error']:
-                        with self.assertRaises(eval(sub_test[0])):
-                            if (data[key]['test_input'] == {}):
-                                response = exec_and_return_locals('response = TestingOpenTreeClass.'+data[key]['test_function']+'()', locals())['response']
-                            else:
-                                args = self.construct_arguments(data[key])
-                                response = exec_and_return_locals(args, locals())["response"]
+                    sub_test = data[key]['tests']['parameters_error']
+                    with self.assertRaises(eval(sub_test[0])):
+                        if (data[key]['test_input'] == {}):
+                            response = exec_and_return_locals('response = TestingOpenTreeClass.'+data[key]['test_function']+'()', locals())['response']
+                        else:
+                            args = self.construct_arguments(data[key])
+                            response = exec_and_return_locals(args, locals())["response"]
                 else:
                     # we got here because there was an exception, but we didn't test for it. Raise it.
                     raise
@@ -207,8 +218,8 @@ class OpenTreeLib(unittest.TestCase):
                     continue
                     # dealt with above!
                 elif test == "contains_error":
-                    for sub_test in data[key]['tests'][test]:
-                        self.assert_("error" in response, key+": "+sub_test[0])
+                    sub_test = data[key]['tests'][test]
+                    self.assert_("error" in response, key+": "+sub_test[0])
                 else:
                     print("\t\t" + bcolors.FAIL + "Oh oh. I didn't know how to deal with test type: " + test + bcolors.ENDC)
 
