@@ -253,7 +253,7 @@ class OpenTreeService(object):
                 payload=payload)
         return result
 
-    def tol_induced_tree(
+    def tol_induced_subtree(
             self,
             ott_ids=None,
             node_ids=None):
@@ -999,14 +999,14 @@ def tol_subtree(
             node_id=node_id,
             tree_id=tree_id)
 
-def tol_induced_tree(
+def tol_induced_subtree(
         ott_ids=None,
         node_ids=None,
         ):
     """
-    Forwards to :meth:`OpenTreeService.tol_induced_tree()` of the global :class:`OpenTreeService` instance.
+    Forwards to :meth:`OpenTreeService.tol_induced_subtree()` of the global :class:`OpenTreeService` instance.
     """
-    return GLOBAL_OPEN_TREE_SERVICE.tol_induced_tree(
+    return GLOBAL_OPEN_TREE_SERVICE.tol_induced_subtree(
             ott_ids=ott_ids,
             node_ids=node_ids)
 
@@ -1230,8 +1230,8 @@ if __name__ == "__main__":
 
     # curl -X POST http://devapi.opentreeoflife.org/v2/tree_of_life/induced_subtree -H "content-type:application/json" -d '{"ott_ids":[292466, 501678, 267845, 666104, 316878, 102710, 176458]}'
     human_readable_output_inspection(
-        function_name='tol_induced_tree',
-        function_output=tol_induced_tree(ott_ids=[292466, 501678, 267845, 666104, 316878, 102710, 176458]))
+        function_name='tol_induced_subtree',
+        function_output=tol_induced_subtree(ott_ids=[292466, 501678, 267845, 666104, 316878, 102710, 176458]))
 
     # ### graph_of_life
 
