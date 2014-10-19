@@ -1,0 +1,18 @@
+Source: python-opentree
+Maintainer: The SupertreeToolkit team <jon.hill@york.ac.uk>
+Uploaders: Jon Hill <jon.hill@york.ac.uk>
+Section: science
+Priority: extra
+Build-Depends:  python-setuptools, python-all-dev, debhelper, python-central, python-support
+Standards-Version: 3.8.0
+XS-Python-Version: >= 2.5
+
+Package: python-opentree
+Architecture: all
+Depends: python-requests
+Suggests: 
+Conflicts: 
+Replaces:
+Provides: ${python:Provides}
+XB-Python-Version: ${python:Versions}
+Description: A python interface for the OpenTree of life project
