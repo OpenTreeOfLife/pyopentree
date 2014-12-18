@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	python setup.py install --root=debian/python-opentree --install-layout=deb --install-scripts=/usr/bin
+
+override_dh_auto_build:
