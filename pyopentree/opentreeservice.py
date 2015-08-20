@@ -34,7 +34,8 @@ class OpenTreeService(object):
 
     def __init__(self, base_url=None):
         if base_url is None:
-            self.base_url = 'http://devapi.opentreeoflife.org/v2'
+            # self.base_url = 'http://devapi.opentreeoflife.org/v2'
+            self.base_url = 'http://api.opentreeoflife.org/v2'
         else:
             self.base_url = base_url
         self.is_testing_mode = False
