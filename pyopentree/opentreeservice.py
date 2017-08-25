@@ -34,8 +34,7 @@ class OpenTreeService(object):
 
     def __init__(self, base_url=None):
         if base_url is None:
-            # self.base_url = 'http://devapi.opentreeoflife.org/v2'
-            self.base_url = 'http://api.opentreeoflife.org/v2'
+            self.base_url = 'https://api.opentreeoflife.org/v3'
         else:
             self.base_url = base_url
         self.is_testing_mode = False
@@ -337,7 +336,7 @@ class OpenTreeService(object):
                 "graph_root_node_id"
                 "graph_root_ott_id"
         """
-        return self.request('/graph/about')
+        return self.request('/tree_of_life/about')
 
     def gol_source_tree(
             self,
@@ -359,7 +358,7 @@ class OpenTreeService(object):
 
         Wraps::
 
-            curl -X POST http://devapi.opentreeoflife.org/v2/graph/source_tree -H "content-type:applicatin/json" -d '{"study_id":"pg_420", "tree_id":"522", "git_sha":"a2c48df995ddc9fd208986c3d4225112550c8452"}'
+            curl -X POST http://api.opentreeoflife.org/v2/graph/source_tree -H "content-type:applicatin/json" -d '{"study_id":"pg_420", "tree_id":"522", "git_sha":"a2c48df995ddc9fd208986c3d4225112550c8452"}'
 
         Parameters
         ----------
@@ -385,7 +384,7 @@ class OpenTreeService(object):
                 'git_sha': git_sha,
                 'format': schema, }
         result = self.request(
-                '/graph/source_tree',
+                '/tree_of_life/source_tree',
                 payload=payload)
         return result
 
@@ -403,7 +402,7 @@ class OpenTreeService(object):
 
         Wraps::
 
-            curl -X POST http://devapi.opentreeoflife.org/v2/graph/node_info -H "content-type:application/json" -d '{"ott_id":810751}'
+            curl -X POST http://api.opentreeoflife.org/v3/tree_of_life/node_info -H "content-type:application/json" -d '{"ott_id":810751}'
 
         Parameters
         ----------
@@ -446,7 +445,7 @@ class OpenTreeService(object):
             raise ValueError('node_id cannot be an empty string.')
         payload = {'ott_id': ott_id, 'node_id': node_id, 'include_lineage': include_lineage}
         result = self.request(
-                '/graph/node_info',
+                '/tree_of_life/node_info',
                 payload=payload)
         return result
 
